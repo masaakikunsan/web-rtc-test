@@ -1,7 +1,7 @@
 <template>
   <div>
-    <video id="theirVideo" src="" autoplay playsinline />
-    <video id="myVideo" src="" muted="true" autoplay playsinline />
+    <video id="theirVideo" autoplay playsinline />
+    <video id="myVideo" muted="true" autoplay playsinline />
     <div>
       マイク:
       <select v-model="selectedAudio" @change="onChange">
@@ -34,19 +34,19 @@ type LocalData = {
   selectedVideo: string
   audios: Audios[]
   videos: Videos[]
-  localStream: MediaStream
+  // localStream: MediaStream
   peerId: string
   callToId: string
 }
 
-type MediaStream = {
-  id: string
-  active: boolean
-  onaddtrack: void | null
-  onremovetrack: void | null
-  onactive: void | null
-  oninactive: void | null
-}
+// type MediaStream = {
+//   id: string
+//   active: boolean
+//   onaddtrack: void | null
+//   onremovetrack: void | null
+//   onactive: void | null
+//   oninactive: void | null
+// }
 
 type Audios = {
   text: string
@@ -58,14 +58,16 @@ type Videos = {
   value: string
 }
 
-export default Vue.extend({
-  asyncData() {
+export default Vue.extend<any, any, any>({
+  async asyncData() {
     const peer = new Peer({
       key: `${process.env.API_KEY}`,
       debug: 3,
     })
+    const localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true })
     return {
-      peer
+      peer,
+      localStream
     }
   },
   data: () :LocalData => ({
@@ -73,25 +75,16 @@ export default Vue.extend({
     selectedVideo: '',
     audios: [],
     videos: [],
-    localStream: {
-      id: '',
-      active: true,
-      onaddtrack: null,
-      onremovetrack: null,
-      onactive: null,
-      oninactive: null
-    },
     peerId: '',
     callToId: ''
   }),
   mounted() {
-    const peer = new Peer({
-      key: `${process.env.API_KEY}`,
-      debug: 3,
-    })
-    console.log(peer)
-    peer.on('open', () => {
-      this.peerId = peer.id
+    // const peer = new Peer({
+    //   key: `${process.env.API_KEY}`,
+    //   debug: 3,
+    // })
+    this.peer.on('open', () => {
+      this.peerId = this.peer.id
     })
     // peer.on('call', call => {
     //   call.answer(this.localStream)
@@ -133,7 +126,9 @@ export default Vue.extend({
       }
       const stream = await navigator.mediaDevices.getUserMedia(constraints)
       this.localStream = stream
-      document.getElementById('myVideo').srcObject = stream
+      console.log(this.localStream)
+      document.getElementById('myVideo').srcObject = this.localStream
+      // this.makeCall()
     },
     makeCall() {
       console.log('makeCall')
