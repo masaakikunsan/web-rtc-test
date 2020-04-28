@@ -18,6 +18,7 @@
         </option>
       </select>
       <div>
+        <p>{{peerId}}</p>
         <input v-model="callToId" placeholder="call id">
         <button @click="makeCall" class="button--green">Call</button>
       </div>
@@ -76,7 +77,7 @@ export default Vue.extend<any, any, any>({
     audios: [],
     videos: [],
     peerId: '',
-    callToId: ''
+    callToId: '',
   }),
   mounted() {
     // const peer = new Peer({
@@ -84,6 +85,7 @@ export default Vue.extend<any, any, any>({
     //   debug: 3,
     // })
     this.peer.on('open', () => {
+      console.log('a', this.peer.id)
       this.peerId = this.peer.id
     })
     // peer.on('call', call => {
@@ -136,11 +138,11 @@ export default Vue.extend<any, any, any>({
       this.connect(call)
     },
     connect(call) {
-      // call.on('stream', stream => {
-      //   const el = document.getElementById('their-video')
-      //   el.srcObject = stream
-      //   el.play()
-      // })
+      call.on('stream', stream => {
+        const el = document.getElementById('their-video')
+        el.srcObject = stream
+        el.play()
+      })
     }
   }
 })
