@@ -139,7 +139,7 @@ export default Vue.extend<any, any, any>({
     },
     connect(call) {
       call.on('stream', stream => {
-        const el = document.getElementById('their-video')
+        const el = document.getElementById('theirVideo')
         el.srcObject = stream
         el.play()
       })
